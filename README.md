@@ -1,2 +1,1 @@
-# GC-content
-# for core and disruptive compartments in Trypanosoma cruzi
+# GC-content for core and disruptive compartments in _Trypanosoma cruzi_
