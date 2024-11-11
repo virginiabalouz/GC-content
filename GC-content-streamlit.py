@@ -175,7 +175,7 @@ if fasta_file is not None and not analysis_type:
 
 
 ################### FASTA FILE AND GFF
-if analysis_type and fasta_file is not None:
+if fasta_file is not None and analysis_type and GFF_file is not None:
     st.write("Upload a GFF file to analyze the GC content and predict Core/Disruptive compartments")
     GFF_file = st.file_uploader("Upload a annotation file (GFF)", type=["gff"])
     if GFF_file is not None:
@@ -228,25 +228,23 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
             df_gc_content["Core/Disruptive"] = np.where(df_gc_content["Smoothed_GC"] < cutoff_value, "Core", "Disruptive")
             # Visualización de datos
             regions_df = pd.DataFrame(all_regions)
-            if analysis_type and GFF_file is not None:
-                if map==1 and len(filtered_Contigs_to_analyze)== 1 and filtered_Contigs_to_analyze[0]!=all_GOI[0]["Contig"]:
-                    st.write("ERROR: INCOMPATIBLE FILES")
+            if map==1 and len(filtered_Contigs_to_analyze)== 1 and filtered_Contigs_to_analyze[0]!=all_GOI[0]["Contig"]:
+                st.write("ERROR: INCOMPATIBLE FILES")
                     # st.write(f"The FASTA file corresponds to {filtered_Contigs_to_analyze[0]} and the GFF to {all_GOI[0]["Contig"]} other sequence")
-                for hit in all_GOI:
-                    f_df = regions_df[regions_df["Contig"] == hit["Contig"] ] #me quedo con las regiones de ese Contig solamente
-                    d_Contig = f_df.to_dict('records')
-                    for region in d_Contig : # list of dict
-                        if int(hit["pbi"]) >= region["Start"] and  int(hit["pbf"]) <= region["End"]:
-                            hit["Region Type"]= region["Region Type"]
-                            hit["Pbi-Region"]= region["Start"]
-                            hit["Pbf-Region"]= region["End"]
-                            hit["Contig-len"]=  max(regions_df[regions_df["Contig"] == hit["Contig"] ]["End"]  )
-                        elif int(hit["pbi"]) >= region["Start"] and not int(hit["pbf"]) <= region["End"]:
-                            hit["Region Type"]= "Edge"
-                            hit["Pbi-Region"]= region["Start"]
-                            hit["Pbf-Region"]= region["End"]
-                            hit["Contig-len"]= max(regions_df[regions_df["Contig"] == hit["Contig"] ]["End"]  )
-
+            for hit in all_GOI:
+                f_df = regions_df[regions_df["Contig"] == hit["Contig"] ] #me quedo con las regiones de ese Contig solamente
+                d_Contig = f_df.to_dict('records')
+                for region in d_Contig : # list of dict
+                    if int(hit["pbi"]) >= region["Start"] and  int(hit["pbf"]) <= region["End"]:
+                        hit["Region Type"]= region["Region Type"]
+                        hit["Pbi-Region"]= region["Start"]
+                        hit["Pbf-Region"]= region["End"]
+                        hit["Contig-len"]=  max(regions_df[regions_df["Contig"] == hit["Contig"] ]["End"]  )
+                    elif int(hit["pbi"]) >= region["Start"] and not int(hit["pbf"]) <= region["End"]:
+                        hit["Region Type"]= "Edge"
+                        hit["Pbi-Region"]= region["Start"]
+                        hit["Pbf-Region"]= region["End"]
+                        hit["Contig-len"]= max(regions_df[regions_df["Contig"] == hit["Contig"] ]["End"]  )
             if plot_count >= num_plots:
                 continue
             fig, ax = plt.subplots(figsize=(10, 5))
@@ -277,8 +275,7 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
     Core= sum(regions_df[regions_df["Region Type"]=="Core"]["Region Length"])
     tot = sum(regions_df["Region Length"])
     df  = pd.DataFrame({'Compartment': ['Core', 'Disruptive'],'%': [Core/tot*100, dis/tot*100], "bases":[Core,dis]})
-    # st.write("Summary statistics")
-    #st.write(f"Disruptive bases: {dis}\nCore bases: {Core}\nTotal bases: {tot} ")
+
     col6,col7 = st.columns(2)
     #plots Summary Core Disruptive
     with col6:
