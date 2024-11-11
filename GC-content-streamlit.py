@@ -91,8 +91,8 @@ if analysis_type and fasta_file is not None:
                 line=line.strip().split("\t")
                 if len(line)>8:
                     Contig=line[0]
-                    pbi=line[3]
-                    pbf=line[4]
+                    pbi=int(line[3])
+                    pbf=int(line[4])
                     desc=line[8]
                     # print({"Contig": Contig, "pbi": pbi, "pbf": pbf, "Description": desc})
                     all_GOI.append({"Contig": Contig, "pbi": pbi, "pbf": pbf, "Description": desc})
@@ -165,7 +165,7 @@ if fasta_file is not None:
                     plt.axvspan(xmin=t[0], xmax=t[1], facecolor='springgreen', alpha=0.2)
             if analysis_type and GFF_file is not None:
                 for pb in df_GOI[df_GOI["Contig"]==record.id]["pbi"]:
-                    ax.axvspan(xmin=int(pb), ymax=0.05,xmax=df_GOI[ (df_GOI["pbi"]==pb) & (df_GOI["Contig"]==record.id) ]["pbf"].iloc[0], color="black", alpha=0.5,label=GOI)
+                    ax.axvspan(xmin=pb, ymax=0.05,xmax=df_GOI[ (df_GOI["pbi"]==pb) & (df_GOI["Contig"]==record.id) ]["pbf"].iloc[0], color="black", alpha=0.5,label=GOI)
                     legend_without_duplicate_labels(ax)
             ax.set_ylim(ymin_graph,ymax_graph)
             ax.set_ylabel("GC Content")
