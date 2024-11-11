@@ -160,9 +160,9 @@ if fasta_file is not None:
             ax.axhline(y=cutoff_value, xmin=0, xmax=max(df_gc_content["End"]), color="white") #curoff line
             for t in regions:
                 if t[-1] == "Disruptive":
-                    plt.axvspan(t[0], t[1], facecolor='salmon', alpha=0.2)
+                    plt.axvspan(xmin=t[0], xmax=t[1], facecolor='salmon', alpha=0.2)
                 elif t[-1] == "Core":
-                    plt.axvspan(t[0], t[1], facecolor='springgreen', alpha=0.2)
+                    plt.axvspan(xmin=t[0], xmax=t[1], facecolor='springgreen', alpha=0.2)
             if analysis_type and GFF_file is not None:
                 for pb in df_GOI[df_GOI["Contig"]==record.id]["pbi"]:
                     ax.axvspan(xmin=int(pb), ymax=0.05,xmax=df_GOI[ (df_GOI["pbi"]==pb) & (df_GOI["Contig"]==record.id) ]["pbf"].iloc[0], color="black", alpha=0.5,label=GOI)
