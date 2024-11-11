@@ -181,6 +181,7 @@ if fasta_file is not None and analysis_type:
     if GFF_file is not None:
         GFF_file_content = StringIO(GFF_file.getvalue().decode("utf-8"))
         all_GOI = []
+        contigs_GOI=[]
         for line in GFF_file_content:
             if GOI in line:
                 line=line.strip().split("\t")
@@ -189,14 +190,16 @@ if fasta_file is not None and analysis_type:
                     pbi=int(line[3])
                     pbf=int(line[4])
                     desc=line[8]
+                    contigs_GOI.append(Contig)
                     # print({"Contig": Contig, "pbi": pbi, "pbf": pbf, "Description": desc})
                     all_GOI.append({"Contig": Contig, "pbi": pbi, "pbf": pbf, "Description": desc})
         df_GOI = pd.DataFrame(data=all_GOI, columns=["Contig", "pbi", "pbf", "Description"])
         #st.subheader(f"Results: {GOI} matches in the GFF file")
         #st.write(f"{len(df_GOI)} {GOI} matches were found in the GFF file")
+        set_contigs_GOI= set(contigs_GOI)
         c_to_map= set(df_GOI["Contig"])
         if len(c_to_map) == 0:
-            st.write(f"No {GOI} were found, Errors will raise")
+            st.write(f"No {GOI} were found, try another keyword")
         elif len(c_to_map) == 1:
             map=1
         else:
@@ -213,7 +216,7 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
     st.subheader("Results: Core and Disruptive genes and tables")
     filtered_Contigs_to_analyze=[]
     for record in sequences:
-        if len(str(record.seq))>=min_len:
+        if len(str(record.seq))>=min_len and record.id in set_contigs_GOI:
             filtered_Contigs_to_analyze.append(record.id)
             gc_content = calculate_gc_content(str(record.seq), window_size, step_size)
             df_gc_content = pd.DataFrame(gc_content, columns=["Start", "End", "GC_Content"])
@@ -228,10 +231,11 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
             df_gc_content["Core/Disruptive"] = np.where(df_gc_content["Smoothed_GC"] < cutoff_value, "Core", "Disruptive")
             # Visualización de datos
             regions_df = pd.DataFrame(all_regions)
-            if map==1 and len(filtered_Contigs_to_analyze)== 1 and filtered_Contigs_to_analyze[0]!=all_GOI[0]["Contig"]:
-                st.write("ERROR: INCOMPATIBLE FILES")
-                    # st.write(f"The FASTA file corresponds to {filtered_Contigs_to_analyze[0]} and the GFF to {all_GOI[0]["Contig"]} other sequence")
-            for hit in all_GOI:
+            # if map==1 and len(filtered_Contigs_to_analyze)==1 and filtered_Contigs_to_analyze[0]!=all_GOI[0]["Contig"]:
+            #     print(map, filtered_Contigs_to_analyze)
+            #     st.write("ERROR: incompatible files. Only CGanner results will be shown. GOI analysis was skipped")
+            #         # st.write(f"The FASTA file corresponds to {filtered_Contigs_to_analyze[0]} and the GFF to {all_GOI[0]["Contig"]} other sequence")
+            for hit in all_GOI: #mapeo de GFF en regiones
                 f_df = regions_df[regions_df["Contig"] == hit["Contig"] ] #me quedo con las regiones de ese Contig solamente
                 d_Contig = f_df.to_dict('records')
                 for region in d_Contig : # list of dict
@@ -245,29 +249,28 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
                         hit["Pbi-Region"]= region["Start"]
                         hit["Pbf-Region"]= region["End"]
                         hit["Contig-len"]= max(regions_df[regions_df["Contig"] == hit["Contig"] ]["End"]  )
-            if plot_count >= num_plots:
-                continue
-            fig, ax = plt.subplots(figsize=(10, 5))
-            sns.lineplot(data=df_gc_content, x="Start", y="GC_Content", ax=ax, label="GC content",alpha=0.5).set_title(f"Sequence name: {record.id}, window size:{window_size}, step size:{step_size}, smoothing points:{smooth_f}, cutoff:{cutoff_value}")
-            sns.lineplot(data=df_gc_content, x="Start", y="Smoothed_GC", color="red", ax=ax, label="Lowess smoothing")
-            ax.axhline(y=cutoff_value, xmin=0, xmax=max(df_gc_content["End"]), color="white") #curoff line
-            for t in regions:
-                if t[-1] == "Disruptive":
-                    plt.axvspan(t[0], t[1], facecolor='salmon', alpha=0.2)
-                elif t[-1] == "Core":
-                    plt.axvspan(t[0], t[1], facecolor='springgreen', alpha=0.2)
-            if analysis_type and GFF_file is not None:
+                print(plot_count, num_plots," antes")
+            if plot_count <= num_plots:
+                plot_count += 1
+                fig, ax = plt.subplots(figsize=(10, 5))
+                sns.lineplot(data=df_gc_content, x="Start", y="GC_Content", ax=ax, label="GC content",alpha=0.5).set_title(f"Sequence name: {record.id}, window size:{window_size}, step size:{step_size}, smoothing points:{smooth_f}, cutoff:{cutoff_value}")
+                sns.lineplot(data=df_gc_content, x="Start", y="Smoothed_GC", color="red", ax=ax, label="Lowess smoothing")
+                ax.axhline(y=cutoff_value, xmin=0, xmax=max(df_gc_content["End"]), color="white") #curoff line
+                for t in regions:
+                    if t[-1] == "Disruptive":
+                        plt.axvspan(t[0], t[1], facecolor='salmon', alpha=0.2)
+                    elif t[-1] == "Core":
+                        plt.axvspan(t[0], t[1], facecolor='springgreen', alpha=0.2)
                 for pb in df_GOI[df_GOI["Contig"]==record.id]["pbi"]:
                     ax.axvspan(xmin=pb, ymax=0.05,xmax=df_GOI[ (df_GOI["pbi"]==pb) & (df_GOI["Contig"]==record.id) ]["pbf"].iloc[0], color="black", alpha=0.5,label=GOI)
                     legend_without_duplicate_labels(ax)
-            ax.set_ylim(ymin_graph,ymax_graph)
-            ax.set_ylabel("GC Content")
-            ax.set_ylabel("GC content and lowess smoothing")
-            ax.set_xlabel("Sequence position")
-            ax.margins(x=0)
-            st.pyplot(fig)
-            all_figs.append((record.id, fig))
-            plot_count += 1
+                ax.set_ylim(ymin_graph,ymax_graph)
+                ax.set_ylabel("GC Content")
+                ax.set_ylabel("GC content and lowess smoothing")
+                ax.set_xlabel("Sequence position")
+                ax.margins(x=0)
+                st.pyplot(fig)
+                all_figs.append((record.id, fig))
 
 
     regions_df["Region Length"]=regions_df["End"]-regions_df["Start"]+1
@@ -295,33 +298,32 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
         st.pyplot(fig)
 
 
-    if analysis_type and GFF_file is not None:
-        df_GOI = pd.DataFrame(data=all_GOI , columns=["Contig", "pbi", "pbf", "Description", "Region Type", "Pbi-Region", "Pbf-Region" , "Contig-len"])
-        filtered_DF_GOI= df_GOI[df_GOI['Contig-len']>min_len][["Contig", "pbi", "pbf", "Description", "Region Type"]]
-        df_trans=filtered_DF_GOI.groupby('Region Type').describe()["Contig"]
-        tot_counts= sum(df_trans["count"])
-        df_trans["%count"]= df_trans["count"]/tot_counts*100
-        col8,col9= st.columns(2)
-        with col8:
-            try:
-                fig, ax = plt.subplots(figsize=(4, 5))
-                sns.barplot(df_trans, x='Region Type', y="%count", hue= 'Region Type',palette={"Disruptive":"red","Core":"green","Edge":"grey"}, alpha=0.2, ax=ax)
-                for i, p in enumerate(ax.patches):
-                    h, w, x = p.get_height(), p.get_width(), p.get_x()
-                    xy = (x + w / 2.,max(df_trans["%count"])*1.15)
-                    text1 = f' {round(df_trans.iloc[i]["count"],2)}\n {round(df_trans.iloc[i]["%count"],2)}%'
-                    ax.annotate(text=text1, xy=xy, ha='center', va='top')
-                ax.set_ylim(0,120)
-                ax.set_ylabel(f"% {GOI}")
-                if map==1:
-                    c=df_GOI["Contig"].iloc[0]
-                    ax.set_title(f"Compartment proportions for\n{GOI} in sequence {c}")
-                else:
-                    ax.set_title(f"Compartment proportions for {GOI}")
-                all_figs.append((f"{GOI} counts", fig))
-                st.pyplot(fig)
-            except:
-                st.write(f"No {GOI} found")
+    df_GOI = pd.DataFrame(data=all_GOI , columns=["Contig", "pbi", "pbf", "Description", "Region Type", "Pbi-Region", "Pbf-Region" , "Contig-len"])
+    filtered_DF_GOI= df_GOI[df_GOI['Contig-len']>min_len][["Contig", "pbi", "pbf", "Description", "Region Type"]]
+    df_trans=filtered_DF_GOI.groupby('Region Type').describe()["pbi"]
+    tot_counts= sum(df_trans["count"])
+    df_trans["%count"]= df_trans["count"]/tot_counts*100
+    col8,col9= st.columns(2)
+    with col8:
+        try:
+            fig, ax = plt.subplots(figsize=(4, 5))
+            sns.barplot(df_trans, x='Region Type', y="%count", hue= 'Region Type',palette={"Disruptive":"red","Core":"green","Edge":"grey"}, alpha=0.2, ax=ax)
+            for i, p in enumerate(ax.patches):
+                h, w, x = p.get_height(), p.get_width(), p.get_x()
+                xy = (x + w / 2.,max(df_trans["%count"])*1.15)
+                text1 = f' {round(df_trans.iloc[i]["count"],2)}\n {round(df_trans.iloc[i]["%count"],2)}%'
+                ax.annotate(text=text1, xy=xy, ha='center', va='top')
+            ax.set_ylim(0,120)
+            ax.set_ylabel(f"% {GOI}")
+            if map==1:
+                c=df_GOI["Contig"].iloc[0]
+                ax.set_title(f"Compartment proportions for\n{GOI} in sequence {c}")
+            else:
+                ax.set_title(f"Compartment proportions for {GOI}")
+            all_figs.append((f"{GOI} counts", fig))
+            st.pyplot(fig)
+        except:
+            st.write(f"No {GOI} were found in GFF file, try another keyword")
 
     # Export/Download graphs as SVG
     with tempfile.TemporaryDirectory() as tmpdirname:
