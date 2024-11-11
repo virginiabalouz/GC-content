@@ -175,7 +175,7 @@ if fasta_file is not None and not analysis_type:
 
 
 ################### FASTA FILE AND GFF
-if fasta_file is not None and analysis_type and GFF_file is not None:
+if fasta_file is not None and analysis_type:
     st.write("Upload a GFF file to analyze the GC content and predict Core/Disruptive compartments")
     GFF_file = st.file_uploader("Upload a annotation file (GFF)", type=["gff"])
     if GFF_file is not None:
