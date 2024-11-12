@@ -4,4 +4,4 @@
 <h5 align="left">Authors: Virginia Balouz and Carlos A. Buscaglia</h5>
 
 <p>The user friendly GCanner app is available   
-<a href="https://gcanner.streamlit.app/">here</a> </p>. 
+<a href="https://gcanner.streamlit.app/">here</a>. </p>
