@@ -65,12 +65,14 @@ with st.sidebar:
     st.caption("This program is part of the Disruptomics project. Please cite Balouz V. et al. 2025")
 
 ###BODY
-st.title("GC Content and Compartment Analysis")
-st.subheader("", divider="red")
+
+st.markdown("<h1 style='text-align: center; color: red;'>GCanner</h1>", unsafe_allow_html=True)
+
+st.subheader("An interactive tool for genome-wide GC analysis", divider="red")
 fasta_file = st.file_uploader("Upload a FASTA file", type=["fasta", "fa"])
 col1, col2, col3 = st.columns(3)
 with col1:
-    min_len = st.number_input("Minimum length to analyze:", min_value=0, max_value=1000000, value=50000)  # Control para la cantidad de gráficos
+    min_len = st.number_input("Minimum sequence length to analyze:", min_value=0, max_value=1000000, value=50000)  # Control para la cantidad de gráficos
 with col2:
     window_size = st.number_input("Window size (0-1000):", min_value=0, max_value=1000, value=500)
 with col3:
@@ -114,7 +116,7 @@ if fasta_file is not None and not analysis_type:
             if plot_count >= num_plots:
                 continue
             fig, ax = plt.subplots(figsize=(10, 5))
-            sns.lineplot(data=df_gc_content, x="Start", y="GC_Content", ax=ax, label="GC content",alpha=0.5).set_title(f"Sequence name: {record.id}, window size:{window_size}, step size:{step_size}, smoothing points:{smooth_f}, cutoff:{cutoff_value}")
+            sns.lineplot(data=df_gc_content, x="Start", y="GC_Content", ax=ax, label="tent",alpha=0.5).set_title(f"Sequence name: {record.id}, window size:{window_size}, step size:{step_size}, smoothing points:{smooth_f}, cutoff:{cutoff_value}")
             sns.lineplot(data=df_gc_content, x="Start", y="Smoothed_GC", color="red", ax=ax, label="Lowess smoothing")
             ax.axhline(y=cutoff_value, xmin=0, xmax=max(df_gc_content["End"]), color="white") #curoff line
             for t in regions:
@@ -217,7 +219,6 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
     plot_count = 0
     for record in sequences:
         if len(str(record.seq))>=min_len and record.id in set_contigs_GOI:
-            # print("ENTRAAA")
             filtered_Contigs_to_analyze.append(record.id)
             gc_content = calculate_gc_content(str(record.seq), window_size, step_size)
             df_gc_content = pd.DataFrame(gc_content, columns=["Start", "End", "GC_Content"])
