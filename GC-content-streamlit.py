@@ -54,16 +54,19 @@ def legend_without_duplicate_labels(ax):
 
 ### SIDEBAR
 with st.sidebar:
-    st.subheader("Choose the type of analysis you want")
-    analysis_type = st.toggle("GOI-based")
+    st.subheader("General settings")
+    analysis_type = st.toggle("Toggle for GOI-based analysis")
     if analysis_type:
-        GOI= st.text_input("Name of the gene of interest", value="MASP", max_chars=100,label_visibility="visible")
+        GOI= st.text_input("Search by gene of interest (keyword)", value="MASP", max_chars=100,label_visibility="visible")
+        GOI= GOI.upper()
+    st.subheader("Graph settings")
     ymin_graph = st.number_input("Y min:", min_value=0.00, step=0.01, max_value=0.50, value=0.20)
     ymax_graph = st.number_input("Y max:", min_value=0.50, step=0.01, max_value=1.00, value=0.80)
     st.caption("This program is part of the Disruptomics project. Please cite Balouz V. et al. 2025")
 
 ###BODY
 st.title("GC Content and Compartment Analysis")
+st.subheader("", divider="red")
 fasta_file = st.file_uploader("Upload a FASTA file", type=["fasta", "fa"])
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -72,14 +75,14 @@ with col2:
     window_size = st.number_input("Window size (0-1000):", min_value=0, max_value=1000, value=500)
 with col3:
     step_size = st.number_input("Step size (0-500):", min_value=0, max_value=500, value=300)
-col4,col5 = st.columns(2)
+col4,col5, col6 = st.columns(3)
 with col4:
     smooth_f = st.slider("Smoothing factor (Lowess):", 0, 200, 100)# Control para la cantidad de gráficos
 with col5:
     cutoff_value = st.slider("Core/Disruptive Cutoff:", 0.1, 1.0, 0.51)
-
-num_plots = st.slider("Number of plots to display:", 0, 20, 1)  # Control para la cantidad de gráficos
-
+with col6:
+    num_plots = st.slider("Number of plots to display:", 0, 20, 1)  # Control para la cantidad de gráficos
+st.subheader("", divider="red")
 ######################FASTA FILE ONLY
 # Almacena gráficos y regiones para exportación
 all_figs = []
@@ -90,7 +93,7 @@ if fasta_file is not None and not analysis_type:
     fasta_content = StringIO(fasta_file.getvalue().decode("utf-8"))
     sequences = SeqIO.parse(fasta_content, "fasta")
     plot_count = 0
-    st.subheader("Results: Core and Disruptive genes and tables")
+    st.subheader("Results: Core and Disruptive genes and tables", divider=False)
     filtered_Contigs_to_analyze=[]
     for record in sequences:
         if len(str(record.seq))>=min_len:
@@ -168,7 +171,6 @@ if fasta_file is not None and not analysis_type:
 
         with open(zip_path, "rb") as f:
             st.download_button("Download figures as SVG", data=f, file_name="plots_svg.zip", mime="application/zip")
-
     st.dataframe(data=regions_df)
     if analysis_type:
         st.dataframe(data=filtered_DF_GOI)
@@ -176,17 +178,17 @@ if fasta_file is not None and not analysis_type:
 
 ################### FASTA FILE AND GFF
 if fasta_file is not None and analysis_type:
-    st.write("Upload a GFF file to analyze the GC content and predict Core/Disruptive compartments")
-    GFF_file = st.file_uploader("Upload a annotation file (GFF)", type=["gff"])
+    # st.write("Upload a GFF file to analyze the GC content and predict Core/Disruptive compartments")
+    GFF_file = st.file_uploader("Upload an annotation file (GFF)", type=["gff"])
     if GFF_file is not None:
         GFF_file_content = StringIO(GFF_file.getvalue().decode("utf-8"))
         all_GOI = []
         contigs_GOI=[]
         for line in GFF_file_content:
-            if GOI in line:
+            if GOI in line.upper():
                 line=line.strip().split("\t")
                 if len(line)>8:
-                    Contig=line[0]
+                    Contig=line[0].strip()
                     pbi=int(line[3])
                     pbf=int(line[4])
                     desc=line[8]
@@ -198,25 +200,24 @@ if fasta_file is not None and analysis_type:
         #st.write(f"{len(df_GOI)} {GOI} matches were found in the GFF file")
         set_contigs_GOI= set(contigs_GOI)
         c_to_map= set(df_GOI["Contig"])
-        if len(c_to_map) == 0:
-            st.write(f"No {GOI} were found, try another keyword")
-        elif len(c_to_map) == 1:
+        if len(c_to_map) == 1:
             map=1
-        else:
-            map=None
+
 # Almacena gráficos y regiones para exportación
 all_figs = []
 all_regions = []
 
 # Análisis cuando se sube el archivo
+
 if fasta_file is not None and analysis_type and GFF_file is not None:
     fasta_content = StringIO(fasta_file.getvalue().decode("utf-8"))
     sequences = SeqIO.parse(fasta_content, "fasta")
-    plot_count = 0
-    st.subheader("Results: Core and Disruptive genes and tables")
+    st.subheader("Results: GOI-based search")
     filtered_Contigs_to_analyze=[]
+    plot_count = 0
     for record in sequences:
         if len(str(record.seq))>=min_len and record.id in set_contigs_GOI:
+            # print("ENTRAAA")
             filtered_Contigs_to_analyze.append(record.id)
             gc_content = calculate_gc_content(str(record.seq), window_size, step_size)
             df_gc_content = pd.DataFrame(gc_content, columns=["Start", "End", "GC_Content"])
@@ -229,7 +230,7 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
                 all_regions.append({"Contig": record.id, "Start": start, "End": end, "Region Type": region_type})
 
             df_gc_content["Core/Disruptive"] = np.where(df_gc_content["Smoothed_GC"] < cutoff_value, "Core", "Disruptive")
-            # Visualización de datos
+
             regions_df = pd.DataFrame(all_regions)
             # if map==1 and len(filtered_Contigs_to_analyze)==1 and filtered_Contigs_to_analyze[0]!=all_GOI[0]["Contig"]:
             #     print(map, filtered_Contigs_to_analyze)
@@ -249,29 +250,40 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
                         hit["Pbi-Region"]= region["Start"]
                         hit["Pbf-Region"]= region["End"]
                         hit["Contig-len"]= max(regions_df[regions_df["Contig"] == hit["Contig"] ]["End"]  )
-                print(plot_count, num_plots," antes")
-            if plot_count <= num_plots:
-                plot_count += 1
-                fig, ax = plt.subplots(figsize=(10, 5))
-                sns.lineplot(data=df_gc_content, x="Start", y="GC_Content", ax=ax, label="GC content",alpha=0.5).set_title(f"Sequence name: {record.id}, window size:{window_size}, step size:{step_size}, smoothing points:{smooth_f}, cutoff:{cutoff_value}")
-                sns.lineplot(data=df_gc_content, x="Start", y="Smoothed_GC", color="red", ax=ax, label="Lowess smoothing")
-                ax.axhline(y=cutoff_value, xmin=0, xmax=max(df_gc_content["End"]), color="white") #curoff line
-                for t in regions:
-                    if t[-1] == "Disruptive":
-                        plt.axvspan(t[0], t[1], facecolor='salmon', alpha=0.2)
-                    elif t[-1] == "Core":
-                        plt.axvspan(t[0], t[1], facecolor='springgreen', alpha=0.2)
-                for pb in df_GOI[df_GOI["Contig"]==record.id]["pbi"]:
-                    ax.axvspan(xmin=pb, ymax=0.05,xmax=df_GOI[ (df_GOI["pbi"]==pb) & (df_GOI["Contig"]==record.id) ]["pbf"].iloc[0], color="black", alpha=0.5,label=GOI)
-                    legend_without_duplicate_labels(ax)
-                ax.set_ylim(ymin_graph,ymax_graph)
-                ax.set_ylabel("GC Content")
-                ax.set_ylabel("GC content and lowess smoothing")
-                ax.set_xlabel("Sequence position")
-                ax.margins(x=0)
-                st.pyplot(fig)
-                all_figs.append((record.id, fig))
+                # print(plot_count, num_plots," antes")
+            if plot_count >= num_plots :# Visualización de datos
+                continue
 
+            fig, ax = plt.subplots(figsize=(10, 5))
+            sns.lineplot(data=df_gc_content, x="Start", y="GC_Content", ax=ax, label="GC content",alpha=0.5).set_title(f"Sequence name: {record.id}, window size:{window_size}, step size:{step_size}, smoothing points:{smooth_f}, cutoff:{cutoff_value}")
+            sns.lineplot(data=df_gc_content, x="Start", y="Smoothed_GC", color="red", ax=ax, label="Lowess smoothing")
+            ax.axhline(y=cutoff_value, xmin=0, xmax=max(df_gc_content["End"]), color="white") #curoff line
+            for t in regions:
+                if t[-1] == "Disruptive":
+                    plt.axvspan(t[0], t[1], facecolor='salmon', alpha=0.2)
+                elif t[-1] == "Core":
+                    plt.axvspan(t[0], t[1], facecolor='springgreen', alpha=0.2)
+            for pb in df_GOI[df_GOI["Contig"]==record.id]["pbi"]:
+                ax.axvspan(xmin=pb, ymax=0.05,xmax=df_GOI[ (df_GOI["pbi"]==pb) & (df_GOI["Contig"]==record.id) ]["pbf"].iloc[0], color="black", alpha=0.5,label=GOI)
+                legend_without_duplicate_labels(ax)
+            ax.set_ylim(ymin_graph,ymax_graph)
+            ax.set_ylabel("GC Content")
+            ax.set_ylabel("GC content and lowess smoothing")
+            ax.set_xlabel("Sequence position")
+            ax.margins(x=0)
+            st.pyplot(fig)
+            plot_count+=1
+            all_figs.append((record.id, fig))
+
+
+if fasta_file is not None and analysis_type and GFF_file is not None:
+    try: #handles empty dataframes due to the lack of GOI within it or non annotated contigs
+        PRU= regions_df["End"]
+    except:
+        regions_df= None
+        st.markdown(f" **:red-background[No ***{GOI}*** and/or inconsistencies between FASTA and GFF files were found]**")
+
+if fasta_file is not None and analysis_type and GFF_file is not None and regions_df is not None:
 
     regions_df["Region Length"]=regions_df["End"]-regions_df["Start"]+1
     dis = sum(regions_df[regions_df["Region Type"]=="Disruptive"]["Region Length"])
@@ -282,7 +294,7 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
     col6,col7 = st.columns(2)
     #plots Summary Core Disruptive
     with col6:
-        fig, ax = plt.subplots(figsize=(4, 4))
+        fig, ax = plt.subplots(figsize=(4, 5))
         sns.barplot(df, x='Compartment', y=round(df['%'],1), hue= 'Compartment',palette=["green", "red"], alpha=0.2, ax=ax)
         for i, p in enumerate(ax.patches):
             h, w, x = p.get_height(), p.get_width(), p.get_x()
@@ -291,7 +303,7 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
             ax.annotate(text=text1, xy=xy, ha='center', va='top')
         ax.set_ylim(0,110)
         if len(filtered_Contigs_to_analyze)== 1:
-            ax.set_title(f"Compartment proportions in {filtered_Contigs_to_analyze[0]} ")
+            ax.set_title(f"Compartment proportions in {filtered_Contigs_to_analyze[0]}\n ")
         else:
             ax.set_title(f"Compartment proportions in all sequences\n>{min_len} from the FASTA file")
         all_figs.append((f"%Compartments_in_>{min_len}", fig))
@@ -303,8 +315,8 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
     df_trans=filtered_DF_GOI.groupby('Region Type').describe()["pbi"]
     tot_counts= sum(df_trans["count"])
     df_trans["%count"]= df_trans["count"]/tot_counts*100
-    col8,col9= st.columns(2)
-    with col8:
+    # col8,col9= st.columns(2)
+    with col7:
         try:
             fig, ax = plt.subplots(figsize=(4, 5))
             sns.barplot(df_trans, x='Region Type', y="%count", hue= 'Region Type',palette={"Disruptive":"red","Core":"green","Edge":"grey"}, alpha=0.2, ax=ax)
