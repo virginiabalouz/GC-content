@@ -1,5 +1,7 @@
-# GC-anner
+<h1 align="left"> GC-anner </h1>
 
+<h4 align="left">An interactive tool for genome-wide GC analysis </h4>
+<h5 align="left">Authors: Virginia Balouz and Carlos A. Buscaglia</h5>
 
-<h4 align="center">An interactive tool for genome-wide GC analysis </h4>
-<h4 align="center">Authors: Virginia Balouz and Carlos A. Buscaglia</h4>
+<p>The user friendly GCanner app is available   
+<a href="https://gcanner.streamlit.app/">here</a> </p>. 
