@@ -68,7 +68,7 @@ with st.sidebar:
 
 st.markdown("<h1 style='text-align: center; color: red;'>GCanner</h1>", unsafe_allow_html=True)
 
-st.subheader("An interactive tool for genome-wide GC analysis", divider="red")
+st.subheader("An interactive tool for genome-wide GC analysis and isochore identification", divider="red")
 fasta_file = st.file_uploader("Upload a FASTA file", type=["fasta", "fa"])
 col1, col2, col3 = st.columns(3)
 with col1:
