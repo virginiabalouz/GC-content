@@ -59,32 +59,25 @@ with st.sidebar:
     if analysis_type:
         GOI= st.text_input("Search by gene of interest (keyword)", value="MASP", max_chars=100,label_visibility="visible")
         GOI= GOI.upper()
+    st.subheader("General settings")
+    min_len = st.number_input("Minimum sequence length to analyze:", min_value=0, max_value=1000000, value=50000)  # Control para la cantidad de gráficos
+    window_size = st.number_input("Window size (0-1000):", min_value=0, max_value=1000, value=500)
+    step_size = st.number_input("Step size (0-500):", min_value=0, max_value=500, value=300)
+    smooth_f = st.slider("Smoothing factor (Lowess):", 0, 200, 100)# Control para la cantidad de gráficos
+    cutoff_value = st.slider("Core/Disruptive Cutoff:", 0.1, 1.0, 0.51)
+    num_plots = st.slider("Number of plots to display:", 0, 20, 1)  # Control para la cantidad de gráficos
     st.subheader("Graph settings")
     ymin_graph = st.number_input("Y min:", min_value=0.00, step=0.01, max_value=0.50, value=0.20)
     ymax_graph = st.number_input("Y max:", min_value=0.50, step=0.01, max_value=1.00, value=0.80)
-    st.caption("This program is part of the Disruptomics project. Please cite Balouz V. et al. 2025")
+
 
 ###BODY
-
-st.markdown("<h1 style='text-align: center; color: red;'>GCanner</h1>", unsafe_allow_html=True)
-
-st.subheader("An interactive tool for genome-wide GC analysis and isochore identification", divider="red")
-fasta_file = st.file_uploader("Upload a FASTA file", type=["fasta", "fa"])
-col1, col2, col3 = st.columns(3)
-with col1:
-    min_len = st.number_input("Minimum sequence length to analyze:", min_value=0, max_value=1000000, value=50000)  # Control para la cantidad de gráficos
-with col2:
-    window_size = st.number_input("Window size (0-1000):", min_value=0, max_value=1000, value=500)
-with col3:
-    step_size = st.number_input("Step size (0-500):", min_value=0, max_value=500, value=300)
-col4,col5, col6 = st.columns(3)
-with col4:
-    smooth_f = st.slider("Smoothing factor (Lowess):", 0, 200, 100)# Control para la cantidad de gráficos
-with col5:
-    cutoff_value = st.slider("Core/Disruptive Cutoff:", 0.1, 1.0, 0.51)
-with col6:
-    num_plots = st.slider("Number of plots to display:", 0, 20, 1)  # Control para la cantidad de gráficos
+st.markdown("<h1 style='text-align: center; color: red; line-height: 0.1'>GCanner</h1><h5 style='text-align: center; color: grey;line-height:1 '> An interactive tool for genome-wide GC analysis and isochore identification</h5>", unsafe_allow_html=True)
 st.subheader("", divider="red")
+st.markdown("<h4 style='text-align: left; color: black;line-height:0.3; margin-top: 0px; '>Upload FASTA file</h5>", unsafe_allow_html=True)
+fasta_file = st.file_uploader("", type=["fasta", "fa"])
+st.subheader("", divider="red")
+
 ######################FASTA FILE ONLY
 # Almacena gráficos y regiones para exportación
 all_figs = []
@@ -180,8 +173,9 @@ if fasta_file is not None and not analysis_type:
 
 ################### FASTA FILE AND GFF
 if fasta_file is not None and analysis_type:
-    # st.write("Upload a GFF file to analyze the GC content and predict Core/Disruptive compartments")
-    GFF_file = st.file_uploader("Upload an annotation file (GFF)", type=["gff"])
+    st.markdown("<h4 style='text-align: left; color: black;line-height:0.1; margin-top: 0px; '>Upload GFF file</h5>", unsafe_allow_html=True)
+    GFF_file = st.file_uploader("", type=["gff"])
+    st.subheader("", divider="red")
     if GFF_file is not None:
         GFF_file_content = StringIO(GFF_file.getvalue().decode("utf-8"))
         all_GOI = []
@@ -357,3 +351,4 @@ if fasta_file is not None and analysis_type and GFF_file is not None and regions
     st.dataframe(data=regions_df)
     if analysis_type:
         st.dataframe(data=filtered_DF_GOI)
+st.caption("This program is part of the Disruptomics project. Please cite Balouz V. et al. 2025")
