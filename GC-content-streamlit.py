@@ -54,8 +54,8 @@ def legend_without_duplicate_labels(ax):
 
 ### SIDEBAR
 with st.sidebar:
-    st.subheader("General settings")
-    analysis_type = st.toggle("Toggle for GOI-based analysis")
+    st.subheader("Select analysis")
+    analysis_type = st.toggle("GOI-based analysis")
     if analysis_type:
         GOI= st.text_input("Search by gene of interest (keyword)", value="MASP", max_chars=100,label_visibility="visible")
         GOI= GOI.upper()
