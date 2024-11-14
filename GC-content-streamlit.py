@@ -95,7 +95,7 @@ if fasta_file is not None and not analysis_type:
     fasta_content = StringIO(fasta_file.getvalue().decode("utf-8"))
     sequences = SeqIO.parse(fasta_content, "fasta")
     plot_count = 0
-    st.subheader("Results: Core and Disruptive genes and tables", divider=False)
+    st.subheader("Results: Core and Disruptive regions", divider=False)
     filtered_Contigs_to_analyze=[]
     for record in sequences:
         if len(str(record.seq))>=min_len:
@@ -116,7 +116,7 @@ if fasta_file is not None and not analysis_type:
             if plot_count >= num_plots:
                 continue
             fig, ax = plt.subplots(figsize=(10, 5))
-            sns.lineplot(data=df_gc_content, x="Start", y="GC_Content", ax=ax, label="tent",alpha=0.5).set_title(f"Sequence name: {record.id}, window size:{window_size}, step size:{step_size}, smoothing points:{smooth_f}, cutoff:{cutoff_value}")
+            sns.lineplot(data=df_gc_content, x="Start", y="GC_Content", ax=ax, label="GC-Content",alpha=0.5).set_title(f"Sequence name: {record.id}, window size:{window_size}, step size:{step_size}, smoothing points:{smooth_f}, cutoff:{cutoff_value}")
             sns.lineplot(data=df_gc_content, x="Start", y="Smoothed_GC", color="red", ax=ax, label="Lowess smoothing")
             ax.axhline(y=cutoff_value, xmin=0, xmax=max(df_gc_content["End"]), color="white") #curoff line
             for t in regions:
@@ -126,7 +126,7 @@ if fasta_file is not None and not analysis_type:
                     plt.axvspan(t[0], t[1], facecolor='springgreen', alpha=0.2)
             ax.set_ylim(ymin_graph,ymax_graph)
             ax.set_ylabel("GC Content")
-            ax.set_ylabel("GC content and lowess smoothing")
+            ax.set_ylabel("GC content and Lowess smoothing")
             ax.set_xlabel("Sequence position")
             ax.margins(x=0)
             st.pyplot(fig)
@@ -269,7 +269,7 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
                 legend_without_duplicate_labels(ax)
             ax.set_ylim(ymin_graph,ymax_graph)
             ax.set_ylabel("GC Content")
-            ax.set_ylabel("GC content and lowess smoothing")
+            ax.set_ylabel("GC content and Lowess smoothing")
             ax.set_xlabel("Sequence position")
             ax.margins(x=0)
             st.pyplot(fig)
