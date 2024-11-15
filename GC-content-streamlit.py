@@ -65,7 +65,7 @@ with st.sidebar:
     step_size = st.number_input("Step size (0-500):", min_value=0, max_value=500, value=300)
     smooth_f = st.slider("Smoothing factor (Lowess):", 0, 200, 100)# Control para la cantidad de gráficos
     cutoff_value = st.slider("Core/Disruptive Cutoff:", 0.1, 1.0, 0.51)
-    num_plots = st.slider("Number of plots to display:", 0, 20, 1)  # Control para la cantidad de gráficos
+    num_plots = st.slider("Number of GC content plots to display:", 0, 20, 1)  # Control para la cantidad de gráficos
     st.subheader("Graph settings")
     ymin_graph = st.number_input("Y min:", min_value=0.00, step=0.01, max_value=0.50, value=0.20)
     ymax_graph = st.number_input("Y max:", min_value=0.50, step=0.01, max_value=1.00, value=0.80)
@@ -75,7 +75,7 @@ with st.sidebar:
 st.markdown("<h1 style='text-align: center; color: red; line-height: 0.1'>GCanner</h1><h5 style='text-align: center; color: grey;line-height:1 '> An interactive tool for genome-wide GC analysis and isochore identification</h5>", unsafe_allow_html=True)
 st.subheader("", divider="red")
 st.markdown("<h4 style='text-align: left; color: black;line-height:0.3; margin-top: 0px; '>Upload FASTA file</h5>", unsafe_allow_html=True)
-fasta_file = st.file_uploader("", type=["fasta", "fa","fna"])
+fasta_file = st.file_uploader("", type=["fasta", "fa", "fna"])
 st.subheader("", divider="red")
 
 ######################FASTA FILE ONLY
