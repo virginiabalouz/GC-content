@@ -75,7 +75,7 @@ with st.sidebar:
 st.markdown("<h1 style='text-align: center; color: red; line-height: 0.1'>GCanner</h1><h5 style='text-align: center; color: grey;line-height:1 '> An interactive tool for genome-wide GC analysis and isochore identification</h5>", unsafe_allow_html=True)
 st.subheader("", divider="red")
 st.markdown("<h4 style='text-align: left; color: black;line-height:0.3; margin-top: 0px; '>Upload FASTA file</h5>", unsafe_allow_html=True)
-fasta_file = st.file_uploader("", type=["fasta", "fa"])
+fasta_file = st.file_uploader("", type=["fasta", "fa","fna"])
 st.subheader("", divider="red")
 
 ######################FASTA FILE ONLY
