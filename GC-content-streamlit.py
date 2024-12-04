@@ -70,7 +70,6 @@ with st.sidebar:
     ymin_graph = st.number_input("Y min:", min_value=0.00, step=0.01, max_value=0.50, value=0.20)
     ymax_graph = st.number_input("Y max:", min_value=0.50, step=0.01, max_value=1.00, value=0.80)
 
-
 ###BODY
 st.markdown("<h1 style='text-align: center; color: red; line-height: 0.1'>GCanner</h1><h5 style='text-align: center; color: grey;line-height:1 '> An interactive tool for genome-wide GC analysis and isochore identification</h5>", unsafe_allow_html=True)
 st.subheader("", divider="red")
@@ -192,8 +191,6 @@ if fasta_file is not None and analysis_type:
 
                     all_GOI.append({"Sequence name"  : Contig, "pbi": pbi, "pbf": pbf, "Description": desc})
         df_GOI = pd.DataFrame(data=all_GOI, columns=["Sequence name"  , "pbi", "pbf", "Description"])
-        #st.subheader(f"Results: {GOI} matches in the GFF file")
-        #st.write(f"{len(df_GOI)} {GOI} matches were found in the GFF file")
         set_contigs_GOI= set(contigs_GOI)
         c_to_map= set(df_GOI["Sequence name"  ])
         if len(c_to_map) == 1:
@@ -227,10 +224,6 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
             df_gc_content["Core/Disruptive"] = np.where(df_gc_content["Smoothed_GC"] < cutoff_value, "Core", "Disruptive")
 
             regions_df = pd.DataFrame(all_regions)
-            # if map==1 and len(filtered_Contigs_to_analyze)==1 and filtered_Contigs_to_analyze[0]!=all_GOI[0]["Sequence name"  ]:
-            #     print(map, filtered_Contigs_to_analyze)
-            #     st.write("ERROR: incompatible files. Only CGanner results will be shown. GOI analysis was skipped")
-            #         # st.write(f"The FASTA file corresponds to {filtered_Contigs_to_analyze[0]} and the GFF to {all_GOI[0]["Sequence name"  ]} other sequence")
             for hit in all_GOI: #mapeo de GFF en regiones
                 f_df = regions_df[regions_df["Sequence name"  ] == hit["Sequence name"  ] ] #me quedo con las regiones de ese Contig solamente
                 d_Contig = f_df.to_dict('records')
@@ -245,7 +238,6 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
                         hit["Pbi-Region"]= region["Start"]
                         hit["Pbf-Region"]= region["End"]
                         hit["Contig-len"]= max(regions_df[regions_df["Sequence name"  ] == hit["Sequence name"  ] ]["End"]  )
-                # print(plot_count, num_plots," antes")
             if plot_count >= num_plots :# Visualización de datos
                 continue
 
@@ -351,4 +343,5 @@ if fasta_file is not None and analysis_type and GFF_file is not None and regions
     st.dataframe(data=regions_df)
     if analysis_type:
         st.dataframe(data=filtered_DF_GOI)
+
 st.caption("This program is part of the Disruptomics project. Please cite Balouz V. et al. 2025")
