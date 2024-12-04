@@ -196,7 +196,7 @@ if fasta_file is not None and analysis_type:
             map=1
         elif len(c_to_map) == 0:
             st.markdown(f" **:red-background[No ***{GOI}*** were found]**")
-            quit()
+            st.stop()
 
 # Almacena gráficos y regiones para exportación
 all_figs = []
