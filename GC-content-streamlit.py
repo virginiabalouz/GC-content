@@ -188,13 +188,15 @@ if fasta_file is not None and analysis_type:
                     pbf=int(line[4])
                     desc=line[8]
                     contigs_GOI.append(Contig)
-
                     all_GOI.append({"Sequence name"  : Contig, "pbi": pbi, "pbf": pbf, "Description": desc})
         df_GOI = pd.DataFrame(data=all_GOI, columns=["Sequence name"  , "pbi", "pbf", "Description"])
         set_contigs_GOI= set(contigs_GOI)
-        c_to_map= set(df_GOI["Sequence name"  ])
+        c_to_map= set(df_GOI["Sequence name"])
         if len(c_to_map) == 1:
             map=1
+        elif len(c_to_map) == 0:
+            st.markdown(f" **:red-background[No ***{GOI}*** were found]**")
+            quit()
 
 # Almacena gráficos y regiones para exportación
 all_figs = []
@@ -268,7 +270,7 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
         PRU= regions_df["End"]
     except:
         regions_df= None
-        st.markdown(f" **:red-background[No ***{GOI}*** and/or inconsistencies between FASTA and GFF files were found]**")
+        st.markdown(f" **:red-background[Inconsistencies between the FASTA and GFF files were found]**")
 
 if fasta_file is not None and analysis_type and GFF_file is not None and regions_df is not None:
 
@@ -296,7 +298,6 @@ if fasta_file is not None and analysis_type and GFF_file is not None and regions
         all_figs.append((f"Compartments proportions in >{min_len} sequences", fig))
         st.pyplot(fig)
 
-
     df_GOI = pd.DataFrame(data=all_GOI , columns=["Sequence name"  , "pbi", "pbf", "Description", "Region Type", "Pbi-Region", "Pbf-Region" , "Contig-len"])
     filtered_DF_GOI= df_GOI[df_GOI['Contig-len']>min_len][["Sequence name"  , "pbi", "pbf", "Description", "Region Type"]]
     df_trans=filtered_DF_GOI.groupby('Region Type').describe()["pbi"]
@@ -322,7 +323,9 @@ if fasta_file is not None and analysis_type and GFF_file is not None and regions
             all_figs.append((f"{GOI} counts", fig))
             st.pyplot(fig)
         except:
-            st.write(f"No {GOI} were found in GFF file, try another keyword")
+            if map ==0:
+                st.write(f"No {GOI} were found in GFF file, try another keyword")
+            # st.write(f"No {GOI} were found in GFF file, try another keyword")
 
     # Export/Download graphs as SVG
     with tempfile.TemporaryDirectory() as tmpdirname:
