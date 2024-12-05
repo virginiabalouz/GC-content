@@ -125,7 +125,9 @@ if fasta_file is not None and not analysis_type:
             all_figs.append((record.id, fig))
             plot_count += 1
 
-
+    if len(all_regions)== 0:
+        st.warning(f" **:red-background[Sequenes are shorter than {min_len} bp, set a shorter minimum sequence length to analyze]**")
+        st.stop()
     regions_df["Region Length"]=regions_df["End"]-regions_df["Start"]+1
     dis = sum(regions_df[regions_df["Region Type"]=="Disruptive"]["Region Length"])
     Core= sum(regions_df[regions_df["Region Type"]=="Core"]["Region Length"])
@@ -197,6 +199,9 @@ if fasta_file is not None and analysis_type:
         elif len(c_to_map) == 0:
             st.markdown(f" **:red-background[No ***{GOI}*** were found]**")
             st.stop()
+        elif GOI == "":
+            st.markdown(f" **:red-background[Write a keyword for the GOI-based search]**")
+            st.stop()
 
 # Almacena gráficos y regiones para exportación
 all_figs = []
@@ -204,7 +209,7 @@ all_regions = []
 
 # Análisis cuando se sube el archivo
 
-if fasta_file is not None and analysis_type and GFF_file is not None:
+if fasta_file is not None and analysis_type and GFF_file is not None and len(GOI)>=1:
     fasta_content = StringIO(fasta_file.getvalue().decode("utf-8"))
     sequences = SeqIO.parse(fasta_content, "fasta")
     st.subheader("Results: GOI-based search")
@@ -265,14 +270,14 @@ if fasta_file is not None and analysis_type and GFF_file is not None:
             all_figs.append((record.id, fig))
 
 
-if fasta_file is not None and analysis_type and GFF_file is not None:
+if fasta_file is not None and analysis_type and GFF_file is not None and len(GOI)>=1:
     try: #handles empty dataframes due to the lack of GOI within it or non annotated contigs
         PRU= regions_df["End"]
     except:
         regions_df= None
         st.markdown(f" **:red-background[Inconsistencies between the FASTA and GFF files were found]**")
 
-if fasta_file is not None and analysis_type and GFF_file is not None and regions_df is not None:
+if fasta_file is not None and analysis_type and GFF_file is not None and regions_df is not None and len(GOI)>=1:
 
     regions_df["Region Length"]=regions_df["End"]-regions_df["Start"]+1
     dis = sum(regions_df[regions_df["Region Type"]=="Disruptive"]["Region Length"])
