@@ -126,7 +126,7 @@ if fasta_file is not None and not analysis_type:
             plot_count += 1
 
     if len(all_regions)== 0:
-        st.warning(f" **:red-background[Sequenes are shorter than {min_len} bp, set a shorter minimum sequence length to analyze]**")
+        st.markdown(f" **:red-background[The sequence length is shorter than {min_len} bp]**")
         st.stop()
     regions_df["Region Length"]=regions_df["End"]-regions_df["Start"]+1
     dis = sum(regions_df[regions_df["Region Type"]=="Disruptive"]["Region Length"])
@@ -275,7 +275,7 @@ if fasta_file is not None and analysis_type and GFF_file is not None and len(GOI
         PRU= regions_df["End"]
     except:
         regions_df= None
-        st.markdown(f" **:red-background[Inconsistencies between the FASTA and GFF files were found]**")
+        st.markdown(f" **:red-background[Inconsistencies were found]**")
 
 if fasta_file is not None and analysis_type and GFF_file is not None and regions_df is not None and len(GOI)>=1:
 
