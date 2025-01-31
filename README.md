@@ -1,4 +1,4 @@
-<h1 align="left"> GC-anner </h1>
+<h1 align="left"> GCanner </h1>
 
 <h4 align="left">An interactive tool for genome-wide GC analysis </h4>
 <h5 align="left">Authors: Virginia Balouz and Carlos A. Buscaglia</h5>
