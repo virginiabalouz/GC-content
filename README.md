@@ -8,7 +8,7 @@ GCanner is a Python-based interactive tool designed for the genome-wide analysis
 The user-friendly GCanner app is available [here](https://gcanner.streamlit.app/)
 
 ## 💡 Quick Tutorial
-
+![Summary](images/SummaryUsage.jpg)
 ### 1️⃣ Upload a FASTA File
 - Click the **'Browse files'** button to upload a FASTA file for analysis.
 - The default page allows uploading files up to **200 MB**.
@@ -45,10 +45,10 @@ The table can be downloaded as a CSV file by clicking the 📥 in the top right 
 This barplot summarizes the proportion of bases classified as core (green) or disruptive (pink). The total count of bases for each compartment (in Kb) and their proportion are displayed at the top of each column.
 
 ### 3️⃣ GC Content Plots
-These plots display the GC content (blue lines), Lowess smoothing (red line), and the predicted regions shaded in green for core regions and pink for disruptive regions along the DNA sequence. Each plot corresponds to one sequence in the FASTA file and is saved as **'plot_sequence_name.svg'**.
+These plots display the GC content (blue lines), Lowess smoothing (red line), and the predicted regions shaded in green for core regions and pink for disruptive regions along the DNA sequence. Each plot corresponds to one sequence in the FASTA file.
 
 ### 3️⃣ Keyword Match Compartment Proportion Plot (for GOI-based searches)
-A bar plot summarizing the frequency of GOI occurrences within each compartment. Matches at compartment boundaries will be categorized as "Edge."
+A bar plot summarizing the frequency of GOI occurrences within each compartment. Matches at compartment boundaries will be categorized as "Edge".
 
 ### 📥 Downloading Results
 By clicking the **‘Download Figures as CSV’** button at the bottom part of the screen, all figures seen in the page will be saved separately in a compressed file named ‘plots_svg.zip’ to the default folder.
