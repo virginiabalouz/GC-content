@@ -78,6 +78,8 @@ The message *'You can now view your Streamlit app in your browser.'* will be pri
 - Empfile, Zipfile, and OS modules for temporary file handling and exporting outputs
 ---
 ✨ Enjoy using GCanner for your genome-wide GC analysis!🚀
+
 📖 Please cite Balouz et al.(2025)
-![EBYN](images/logo_ebyn.jpg)
+
+![EBYN](images/logo_ebyn.png)
 ![CONICET](images/logo-CONICET.png)
