@@ -24,7 +24,7 @@ def calculate_gc_content(sequence, window, step):
         end = min(i + window, sequence_length)
         window_sequence = sequence[start:end]
         if len(window_sequence) > 0:
-            gc_count = window_sequence.count('G') + window_sequence.count('C')
+            gc_count = window_sequence.count('G') + window_sequence.count('C') + window_sequence.count('g') + window_sequence.count('g')
             gc_percent = gc_count / len(window_sequence)
             gc_content.append((start + 1, end, gc_percent))
     return gc_content
