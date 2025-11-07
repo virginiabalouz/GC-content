@@ -79,7 +79,9 @@ The message *'You can now view your Streamlit app in your browser.'* will be pri
 ---
 ✨ Enjoy using GCanner for your genome-wide GC analysis!🚀
 
-📖 Please cite Balouz et al.(2025)
+📖 Please cite Balouz, V., Buscaglia, C.A. (2026). GCanner, a Genome-Wide GC Composition Tool for the Unbiased Assessment of Trypanosoma cruzi Genomic Compartments. In: Gómez, K.A., Buscaglia, C.A. (eds) T. cruzi Infection. Methods in Molecular Biology, vol 2982. Humana, New York, NY. https://doi.org/10.1007/978-1-0716-4848-3_3
+
+👉 Questions or suggestions? Feel free to contact me at vbalouz@iib.unsam.edu.ar
 
 ![EBYN](images/logo_ebyn.png)
 ![CONICET](images/logo-CONICET.png)
