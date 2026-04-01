@@ -221,4 +221,4 @@ if fasta_file:
             st.write(f"### {GOI} Mapping Table")
             st.dataframe(pd.DataFrame(all_GOI))
 
-st.caption("Disruptomics project. Balouz V, Buscaglia CA. 2026")
+st.caption("Disruptomics project. Balouz V, Buscaglia CA. GCanner, a Genome-Wide GC Composition Tool for the Unbiased Assessment of Trypanosoma cruzi Genomic Compartments. Methods Mol Biol. 2026;2982:31-45. doi: 10.1007/978-1-0716-4848-3_3. PMID: 41182609.")
