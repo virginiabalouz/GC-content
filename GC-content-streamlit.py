@@ -353,4 +353,4 @@ if fasta_file is not None and analysis_type and GFF_file is not None and regions
     if analysis_type:
         st.dataframe(data=filtered_DF_GOI)
 
-st.caption("This program is part of the Disruptomics project. Please cite Balouz V. et al. 2025")
+st.caption("This program is part of the Disruptomics project. Please cite Balouz V, Buscaglia CA. GCanner, a Genome-Wide GC Composition Tool for the Unbiased Assessment of Trypanosoma cruzi Genomic Compartments. Methods Mol Biol. 2026;2982:31-45. doi: 10.1007/978-1-0716-4848-3_3. PMID: 41182609.")
